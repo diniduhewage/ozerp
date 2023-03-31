@@ -1,4 +1,4 @@
-package com.onenzero.ozerp.appbase;
+package com.onenzero.ozerp.appbase.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,7 +24,8 @@ public class AppUser implements UserDetails {
     private String password;
     private String firstName;
     private String lastName;
-    private Boolean activeUser;
+    private Boolean activeUser = false;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
