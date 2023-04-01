@@ -1,18 +1,17 @@
 package com.onenzero.ozerp.appbase.dto;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -20,19 +19,17 @@ import java.io.Serializable;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
-public class PermissionDto implements Serializable {
+public class RoleDTO implements Serializable {
 
-	@Serial
 	private static final long serialVersionUID = 1L;
 	private Long id;
+	@NotEmpty(message = "Please provide name")
+	private String name;
+	@NotEmpty(message = "Please provide code")
 	private String code;
-	@NotNull(message = "Please provide componentDTO")
-	@Valid
-    private ComponentDto componentDTO;
-	@NotNull(message = "Please provide actionDTO")
-	@Valid
-    private ActionDto actionDTO;
-    private Long createdDate;
+	private Long createdDate;
 	private Long modifiedDate;
-    
+	@NotNull(message = "Please provide permissionDTOs")
+	private List<PermissionDTO> permissionDTOList;
+
 }

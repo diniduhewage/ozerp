@@ -25,5 +25,4 @@ public class UserRole {
     @JoinColumn(name = "roleId", referencedColumnName = "id", nullable = false, foreignKey = @ForeignKey(name = "FK_ROLE_2"))
     private Role role;
 	
-	
 }

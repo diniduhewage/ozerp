@@ -5,30 +5,19 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serial;
 import java.io.Serializable;
-import java.util.List;
-
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
-public class ComponentDto implements Serializable {
+public class PasswordResetDTO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
-	private Long id;
-	@NotEmpty(message = "Please provide name")
-	private String name;
-	@NotEmpty(message = "Please provide code")
-	private String code;
-	private Long createdDate;
-	private Long modifiedDate;
-    private List<PermissionDto> permissions;
+	@NotEmpty(message = "Please provide email")
+	private String userName;
+	
 }
+
