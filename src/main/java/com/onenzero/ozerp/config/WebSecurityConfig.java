@@ -1,6 +1,6 @@
 package com.onenzero.ozerp.config;
 
-import com.onenzero.ozerp.appbase.filter.JwtFilter;
+import com.onenzero.ozerp.core.filter.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,43 +19,43 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
-	
+
 	@Autowired
 	@Lazy
     private JwtFilter jwtFilter;
-	
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder(11);
 	}
-	
+
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
-	    return web -> web.ignoring()
-	                       .dispatcherTypeMatchers(HttpMethod.valueOf("/**/register"))
-	                       .dispatcherTypeMatchers(HttpMethod.valueOf("/verifyRegistration"))
-	                       .dispatcherTypeMatchers(HttpMethod.valueOf("/resendVerifyToken"))
-	                       .dispatcherTypeMatchers(HttpMethod.valueOf("/**/resetPassword"))
-	                       .dispatcherTypeMatchers(HttpMethod.valueOf("/**/reset/password"))
-	                       .dispatcherTypeMatchers(HttpMethod.valueOf("/**/changePassword"))
-	                       .dispatcherTypeMatchers(HttpMethod.valueOf("/**/login"));
+		return web -> web.ignoring()
+				.dispatcherTypeMatchers(HttpMethod.valueOf("/**/register"))
+				.dispatcherTypeMatchers(HttpMethod.valueOf("/verifyRegistration"))
+				.dispatcherTypeMatchers(HttpMethod.valueOf("/resendVerifyToken"))
+				.dispatcherTypeMatchers(HttpMethod.valueOf("/**/resetPassword"))
+				.dispatcherTypeMatchers(HttpMethod.valueOf("/**/reset/password"))
+				.dispatcherTypeMatchers(HttpMethod.valueOf("/**/changePassword"))
+				.dispatcherTypeMatchers(HttpMethod.valueOf("/**/login"));
 	}
 
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
-			.cors()
-			.and()
-			.csrf()
-			.disable()
-			.authorizeRequests()
-			.anyRequest()
-        	.authenticated()
-        	.and()
-        	.sessionManagement()
-        	.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+				.cors()
+				.and()
+				.csrf()
+				.disable()
+				.authorizeRequests()
+				.anyRequest()
+				.authenticated()
+				.and()
+				.sessionManagement()
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-		
+
 		return http.build();
 	}
 }
