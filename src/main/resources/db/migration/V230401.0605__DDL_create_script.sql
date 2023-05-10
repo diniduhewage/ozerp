@@ -9,7 +9,6 @@ CREATE TABLE `action_tab` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-
 DROP TABLE IF EXISTS `component_tab`;
 CREATE TABLE `component_tab` (
   `id` bigint NOT NULL AUTO_INCREMENT,
@@ -19,7 +18,6 @@ CREATE TABLE `component_tab` (
   `name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
 
 
 DROP TABLE IF EXISTS `permission_tab`;
@@ -38,7 +36,6 @@ CREATE TABLE `permission_tab` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-
 DROP TABLE IF EXISTS `role_tab`;
 CREATE TABLE `role_tab` (
   `id` bigint NOT NULL AUTO_INCREMENT,
@@ -48,7 +45,6 @@ CREATE TABLE `role_tab` (
   `name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
 
 
 DROP TABLE IF EXISTS `role_permission_tab`;
@@ -66,7 +62,6 @@ CREATE TABLE `role_permission_tab` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-
 DROP TABLE IF EXISTS `app_user_tab`;
 CREATE TABLE `app_user_tab` (
   `id` bigint NOT NULL AUTO_INCREMENT,
@@ -79,7 +74,6 @@ CREATE TABLE `app_user_tab` (
   `user_name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
 
 
 DROP TABLE IF EXISTS `user_role_tab`;
@@ -97,7 +91,6 @@ CREATE TABLE `user_role_tab` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-
 DROP TABLE IF EXISTS `verification_token_tab`;
 CREATE TABLE `verification_token_tab` (
   `id` bigint NOT NULL AUTO_INCREMENT,
@@ -110,7 +103,6 @@ CREATE TABLE `verification_token_tab` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-
 DROP TABLE IF EXISTS `password_reset_token_tab`;
 CREATE TABLE `password_reset_token_tab` (
   `id` bigint NOT NULL AUTO_INCREMENT,
@@ -121,3 +113,51 @@ CREATE TABLE `password_reset_token_tab` (
   KEY `FK_USER_PASSWORD_RESET_TOKEN` (`user_id`),
   CONSTRAINT `FK_USER_PASSWORD_RESET_TOKEN` FOREIGN KEY (`user_id`) REFERENCES `app_user_tab` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+DROP TABLE IF EXISTS `company_tab`;
+CREATE TABLE `company_tab` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `company_id` varchar(30) NOT NULL,
+  `company_name` varchar(100) NOT NULL,
+  `company_logo` varchar(100) DEFAULT NULL,
+  `created_by` bigint DEFAULT NULL,
+  `created_date` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UK_company_id` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+DROP TABLE IF EXISTS `company_contact_info_tab`;
+CREATE TABLE `company_contact_info_tab` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `company_id` bigint NOT NULL,
+  `contact_id` String NOT NULL,
+  `contact_type` varchar(30) NOT NULL,
+  `contact_value` varchar(100) NOT NULL,
+  `is_primary` boolean DEFAULT false,
+  PRIMARY KEY (`id`),
+  KEY `FK_company_id` (`company_id`),
+  CONSTRAINT `FK_company_id` FOREIGN KEY (`company_id`) REFERENCES `company_tab` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+DROP TABLE IF EXISTS `company_address_tab`;
+CREATE TABLE `company_address_tab` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `company_id` bigint NOT NULL,
+  `address_id` String NOT NULL,
+  `address_type` varchar(30) NOT NULL,
+  `address1` varchar(30) NOT NULL,
+  `address2` varchar(30) DEFAULT NULL,
+  `city` varchar(30) NOT NULL,
+  `state` varchar(30) NOT NULL,
+  `country` varchar(100) NOT NULL,
+  `zip_code` varchar(100) NOT NULL,
+  `is_primary` boolean DEFAULT false,
+  PRIMARY KEY (`id`),
+  KEY `FK_company_id` (`company_id`),
+  CONSTRAINT `FK_company_id` FOREIGN KEY (`company_id`) REFERENCES `company_tab` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
