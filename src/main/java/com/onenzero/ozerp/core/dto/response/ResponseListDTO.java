@@ -4,6 +4,7 @@ import com.onenzero.ozerp.core.enums.ResultStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 
@@ -13,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Setter
 public class ResponseListDTO<T> extends ResultsDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;

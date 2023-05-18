@@ -16,8 +16,6 @@ public class LocalizationConfig {
 	        SessionLocaleResolver sessionLocaleResolver = new SessionLocaleResolver();
 	        sessionLocaleResolver.setDefaultLocale(Locale.US);
 	        return sessionLocaleResolver;
-
-
 	    }
 
 	    @Bean
@@ -27,5 +25,4 @@ public class LocalizationConfig {
 	        resourceBundleMessageSource.setUseCodeAsDefaultMessage(true);
 	        return resourceBundleMessageSource;
 	    }
-
 }

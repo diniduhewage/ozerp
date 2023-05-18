@@ -34,7 +34,7 @@ public class ComponentServiceImpl implements ComponentService {
     @Override
     public ComponentDTO getComponentById(Long id) throws NotFoundException, com.onenzero.ozerp.core.error.exception.TransformerException {
         if (!componentRepository.existsById(id)) {
-            throw new NotFoundException(MessageConstants.COMPONENT_NOT_FOUND + id);
+            throw new NotFoundException(MessageConstants.RECORD_NOT_FOUND + id);
         }
         return componentTransformer.transformDomainToDTO(componentRepository.findById(id).get());
     }

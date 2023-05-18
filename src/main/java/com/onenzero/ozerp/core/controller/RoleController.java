@@ -3,12 +3,10 @@ package com.onenzero.ozerp.core.controller;
 import com.onenzero.ozerp.core.dto.RoleDTO;
 import com.onenzero.ozerp.core.dto.response.ResponseDTO;
 import com.onenzero.ozerp.core.dto.response.ResponseListDTO;
-import com.onenzero.ozerp.core.enums.ResultStatus;
 import com.onenzero.ozerp.core.error.exception.NotFoundException;
 import com.onenzero.ozerp.core.service.RoleService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,43 +31,29 @@ public class RoleController {
 
 		ResponseDTO<RoleDTO> response = new ResponseDTO<>();
 		response.setPayload(roleService.saveRole(roleDTO));
-		return updateResponse(response);
+		return ResponseDTO.response(response);
 	}
 
 	@GetMapping("/roles/{id}")
 	@PreAuthorize("hasAuthority('VIEW_ROLE')")
-	public ResponseDTO<?> getRoleById(@PathVariable Long id) throws NotFoundException, TransformerException, javax.xml.transform.TransformerException, com.onenzero.ozerp.core.error.exception.TransformerException {
+	public ResponseDTO<?> getRoleById(@PathVariable Long id) throws NotFoundException, javax.xml.transform.TransformerException, com.onenzero.ozerp.core.error.exception.TransformerException {
 
 		ResponseDTO<RoleDTO> response = new ResponseDTO<>();
 		response.setPayload(roleService.getRoleById(id));
-		return updateResponse(response);
+		return ResponseDTO.response(response);
 
 	}
 
 	@GetMapping("/roles")
 	@PreAuthorize("hasAuthority('VIEW_LIST_ROLE')")
-	public ResponseListDTO<?> getAllRoles() throws TransformerException, javax.xml.transform.TransformerException, com.onenzero.ozerp.core.error.exception.TransformerException {
+	public ResponseListDTO<?> getAllRoles() throws javax.xml.transform.TransformerException, com.onenzero.ozerp.core.error.exception.TransformerException {
 
 		List<RoleDTO> roleDTOList = roleService.getAllRoles();
 		ResponseListDTO<RoleDTO> response = new ResponseListDTO<>();
 		response.setPayloadDto(roleDTOList);
-		response.setCount(roleDTOList.size());
-		return updateResponse(response);
+		response.setSize(roleDTOList.size());
+		return ResponseListDTO.generateResponse(response);
 
-	}
-
-	private ResponseDTO<?> updateResponse(ResponseDTO<?> response) {
-		response.setResultStatus(ResultStatus.SUCCESSFUL);
-        response.setHttpStatus(HttpStatus.OK);
-        response.setHttpCode(response.getHttpStatus().toString());
-		return response;
-	}
-
-	private ResponseListDTO<?> updateResponse(ResponseListDTO<?> response) {
-		response.setResultStatus(ResultStatus.SUCCESSFUL);
-        response.setHttpStatus(HttpStatus.OK);
-        response.setHttpCode(response.getHttpStatus().toString());
-		return response;
 	}
 
 }

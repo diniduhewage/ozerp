@@ -3,73 +3,72 @@ package com.onenzero.ozerp.core.controller;
 import com.onenzero.ozerp.core.dto.ComponentDTO;
 import com.onenzero.ozerp.core.dto.response.ResponseDTO;
 import com.onenzero.ozerp.core.dto.response.ResponseListDTO;
-import com.onenzero.ozerp.core.enums.ResultStatus;
-import com.onenzero.ozerp.core.error.exception.NotFoundException;
-import com.onenzero.ozerp.core.error.exception.TransformerException;
-import com.onenzero.ozerp.core.service.ComponentService;
+import com.onenzero.ozerp.core.service.impl.ComponentService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
+//@Tag(name = "COMPONENT", description = "COMPONENT API")
+//@SecurityRequirements({
+//        @SecurityRequirement(name = "bearer-jwt")
+//})
 @RestController
-@RequestMapping("api/v1")
+@RequiredArgsConstructor
+@RequestMapping("api/v1/component")
 public class ComponentController {
+    private final ComponentService componentService;
 
-	@Autowired
-	private ComponentService componentService;
+    @PostMapping
+    @PreAuthorize("hasAuthority('ADD_COMPONENT')")
+    public ResponseDTO<?> saveComponent(@Valid @RequestBody ComponentDTO componentDTO) {
 
-	@PostMapping("/components")
-	@PreAuthorize("hasAuthority('ADD_COMPONENT')")
-	public ResponseDTO<?> saveComponent(@Valid @RequestBody ComponentDTO componentDTO) throws TransformerException {
+        ResponseDTO<ComponentDTO> response = new ResponseDTO<>();
+        response.setPayload(componentService.save(componentDTO));
+        return ResponseDTO.response(response, HttpStatus.CREATED);
+    }
 
-		ResponseDTO<ComponentDTO> response = new ResponseDTO<>();
-		response.setPayload(componentService.saveComponent(componentDTO));
-        return updateResponse(response);
-	}
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('VIEW_COMPONENT')")
+    public ResponseDTO<?> getComponentById(@PathVariable Long id) throws EntityNotFoundException {
 
-	@GetMapping("/components/{id}")
-	@PreAuthorize("hasAuthority('VIEW_COMPONENT')")
-	public ResponseDTO<?> getComponentById(@PathVariable Long id) throws NotFoundException, TransformerException {
+        ResponseDTO<ComponentDTO> response = new ResponseDTO<>();
+        response.setPayload(componentService.getById(id));
+        return ResponseDTO.response(response);
 
-		ResponseDTO<ComponentDTO> response = new ResponseDTO<>();
-		response.setPayload(componentService.getComponentById(id));
-		return updateResponse(response);
+    }
 
-	}
+    @GetMapping
+    @PreAuthorize("hasAuthority('VIEW_LIST_COMPONENT')")
+    public ResponseListDTO<?> getAllComponent(Pageable pageable) {
+        ResponseListDTO<ComponentDTO> response = componentService.getAll(pageable);
+        return ResponseListDTO.generateResponse(response);
 
-	@GetMapping("/components")
-	@PreAuthorize("hasAuthority('VIEW_LIST_COMPONENT')")
-	public ResponseListDTO<?> getAllComponents() throws TransformerException {
+    }
 
-		List<ComponentDTO> componentDTOList = componentService.getAllComponents();
-		ResponseListDTO<ComponentDTO> response = new ResponseListDTO<>();
-		response.setPayloadDto(componentDTOList);
-		response.setCount(componentDTOList.size());
-		return updateResponse(response);
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('EDIT_COMPONENT')")
+    public ResponseDTO<?> updateComponentById(@PathVariable Long id, @RequestBody @Valid ComponentDTO componentDTO) {
+        ResponseDTO<ComponentDTO> response = new ResponseDTO<>();
+        response.setPayload(componentService.update(id, componentDTO));
+        return ResponseDTO.response(response);
+    }
 
-	}
-
-	private ResponseDTO<?> updateResponse(ResponseDTO<?> response) {
-		response.setResultStatus(ResultStatus.SUCCESSFUL);
-        response.setHttpStatus(HttpStatus.OK);
-        response.setHttpCode(response.getHttpStatus().toString());
-		return response;
-	}
-
-	private ResponseListDTO<?> updateResponse(ResponseListDTO<?> response) {
-		response.setResultStatus(ResultStatus.SUCCESSFUL);
-        response.setHttpStatus(HttpStatus.OK);
-        response.setHttpCode(response.getHttpStatus().toString());
-		return response;
-	}
-
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('DELETE_COMPONENT')")
+    public ResponseDTO<?> deleteComponentById(@PathVariable Long id) {
+        ResponseDTO<Boolean> response = new ResponseDTO<>();
+        response.setPayload(componentService.delete(id));
+        return ResponseDTO.response(response);
+    }
 }

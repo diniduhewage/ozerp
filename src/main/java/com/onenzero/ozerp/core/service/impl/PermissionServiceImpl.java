@@ -12,29 +12,25 @@ import com.onenzero.ozerp.core.repository.PermissionRepository;
 import com.onenzero.ozerp.core.repository.RolePermissionRepository;
 import com.onenzero.ozerp.core.service.PermissionService;
 import com.onenzero.ozerp.core.transformer.PermissionTransformer;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 
-
+@Deprecated
 @Service
+@RequiredArgsConstructor
 public class PermissionServiceImpl implements PermissionService {
 
     private final Logger logger = LoggerFactory.getLogger(PermissionService.class);
-    @Autowired
-    private PermissionRepository permissionRepository;
-    @Autowired
-    private PermissionTransformer permissionTransformer;
-    @Autowired
-    private ActionRepository actionRepository;
-    @Autowired
-    private ComponentRepository componentRepository;
-    @Autowired
-    private RolePermissionRepository rolePermissionRepository;
+    private final PermissionRepository permissionRepository;
+    private final PermissionTransformer permissionTransformer;
+    private final ActionRepository actionRepository;
+    private final ComponentRepository componentRepository;
+    private final RolePermissionRepository rolePermissionRepository;
 
     @Override
     public PermissionDTO savePermission(PermissionDTO permissionDTO) throws TransformerException {
@@ -53,7 +49,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public PermissionDTO getPermissionById(Long id) throws NotFoundException, TransformerException {
         if (!permissionRepository.existsById(id)) {
-            throw new NotFoundException(MessageConstants.PERMISSION_NOT_FOUND + id);
+            throw new NotFoundException(MessageConstants.RECORD_NOT_FOUND + id);
         }
         return permissionTransformer.transformDomainToDTO(permissionRepository.findById(id).get());
     }
@@ -65,13 +61,12 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public PermissionDeleteDTO deletePermissionByRoleAndPermission(PermissionDeleteDTO permissionDeleteDTO) throws NotFoundException {
-        /*RolePermission rolePermission = rolePermissionRepository.
-				findPermissionForRole(permissionDeleteDTO.getPermissionId(), permissionDeleteDTO.getRoleId());*/
-        if (permissionDeleteDTO.getRoleId() == null || permissionDeleteDTO.getPermissionId() == null || Objects.isNull(permissionDeleteDTO)) {
+        if (Objects.isNull(permissionDeleteDTO) ||
+                permissionDeleteDTO.getRoleId() == null ||
+                permissionDeleteDTO.getPermissionId() == null) {
             throw new NotFoundException("Permission not Available");
         } else {
             rolePermissionRepository.deletePermissionForRole(permissionDeleteDTO.getPermissionId(), permissionDeleteDTO.getRoleId());
-            //	permissionDeleteDTO.setPermission(rolePermission.getPermission().getCode());
             permissionDeleteDTO.setIsPermissionDeleted(true);
             return permissionDeleteDTO;
         }

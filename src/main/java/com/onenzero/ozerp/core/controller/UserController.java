@@ -9,7 +9,6 @@ import com.onenzero.ozerp.core.dto.response.ResponseDTO;
 import com.onenzero.ozerp.core.dto.response.ResponseListDTO;
 import com.onenzero.ozerp.core.entity.PasswordResetToken;
 import com.onenzero.ozerp.core.entity.VerificationToken;
-import com.onenzero.ozerp.core.enums.ResultStatus;
 import com.onenzero.ozerp.core.error.exception.BadRequestException;
 import com.onenzero.ozerp.core.error.exception.NotFoundException;
 import com.onenzero.ozerp.core.error.exception.TransformerException;
@@ -22,7 +21,6 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,21 +53,21 @@ public class UserController {
 		userDTO = userService.registerUser(userDTO);
 		response.setPayload(userDTO);
 		publisher.publishEvent(new RegistrationCompleteEvent(userDTO, getApplicationUrl(request)));
-        return updateResponse(response);
+		return ResponseDTO.response(response);
 	}
 
 	@PostMapping("/changePassword")
-	public ResponseDTO<?> changePassword(@RequestBody @Valid PasswordDTO passwordDTO) throws TransformerException {
+	public ResponseDTO<?> changePassword(@RequestBody @Valid PasswordDTO passwordDTO) {
 		ResponseDTO<String> response = new ResponseDTO<>();
 		response.setPayload(userService.changePassword(passwordDTO));
-		return updateResponse(response);
+		return ResponseDTO.response(response);
 	}
 
 	@PostMapping("/login")
     public ResponseDTO<?> login(@RequestBody @Valid LoginRequestDTO loginRequestDTO) throws Exception{
 		ResponseDTO<JWTResponseDTO> response = new ResponseDTO<>();
 		response.setPayload(userService.getToken(loginRequestDTO));
-		return updateResponse(response);
+		return ResponseDTO.response(response);
     }
 
 	@GetMapping("/users")
@@ -78,8 +76,8 @@ public class UserController {
 		List<UserDTO> userDTOList = userService.getAllUsers();
 		ResponseListDTO<UserDTO> response = new ResponseListDTO<>();
 		response.setPayloadDto(userDTOList);
-		response.setCount(userDTOList.size());
-		return updateResponse(response);
+		response.setSize(userDTOList.size());
+		return ResponseListDTO.generateResponse(response);
 
 	}
 
@@ -91,7 +89,7 @@ public class UserController {
 			PasswordResetToken passwordResetToken = passwordResetService.createToken(userDTO);
 			sendPasswordResetTokenMail(passwordResetToken, request);
 			response.setPayload("Password resend link send to your mail!");
-			return updateResponse(response);
+			return ResponseDTO.response(response);
 		}
 		throw new NotFoundException("User not found");
 	}
@@ -101,7 +99,7 @@ public class UserController {
 		ResponseDTO<String> response = new ResponseDTO<>();
 		String result = passwordResetService.validatePasswordResetTokenAndSavePassword(token, loginRequestDTO);
 		response.setPayload(result);
-		return updateResponse(response);
+		return ResponseDTO.response(response);
 	}
 
 	@GetMapping("/verifyRegistration")
@@ -110,7 +108,7 @@ public class UserController {
 		String result = verificationTokenService.validateVerificationToken(token);
 		if (result.equalsIgnoreCase("valid")) {
 			response.setPayload("User Verified Successfully!");
-			return updateResponse(response);
+			return ResponseDTO.response(response);
 		}
 		throw new BadRequestException("Bad User!");
 	}
@@ -121,7 +119,7 @@ public class UserController {
 		VerificationToken verificationToken = verificationTokenService.generateNewVerificationToken(oldToken);
 		resendVerificationTokenMail(verificationToken, request);
 		response.setPayload("Verification mail sent");
-		return updateResponse(response);
+		return ResponseDTO.response(response);
 	}
 
 	private String getApplicationUrl(HttpServletRequest request) {
@@ -136,21 +134,6 @@ public class UserController {
 	private void sendPasswordResetTokenMail(PasswordResetToken passwordResetToken, HttpServletRequest request) {
 		log.info("Click the link to reset your password: {}",
 				getApplicationUrl(request) + "/savePassword?token=" + passwordResetToken.getToken());
-	}
-
-
-	private ResponseDTO<?> updateResponse(ResponseDTO<?> response) {
-		response.setResultStatus(ResultStatus.SUCCESSFUL);
-        response.setHttpStatus(HttpStatus.OK);
-        response.setHttpCode(response.getHttpStatus().toString());
-		return response;
-	}
-
-	private ResponseListDTO<?> updateResponse(ResponseListDTO<?> response) {
-		response.setResultStatus(ResultStatus.SUCCESSFUL);
-        response.setHttpStatus(HttpStatus.OK);
-        response.setHttpCode(response.getHttpStatus().toString());
-		return response;
 	}
 
 }

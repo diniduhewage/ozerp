@@ -44,7 +44,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public RoleDTO getRoleById(Long id) throws NotFoundException, TransformerException {
         if (!roleRepository.existsById(id)) {
-            throw new NotFoundException(MessageConstants.ROLE_NOT_FOUND + id);
+            throw new NotFoundException(MessageConstants.RECORD_NOT_FOUND + id);
         }
         return roleTransformer.transformDomainToDTO(roleRepository.findById(id).get());
     }

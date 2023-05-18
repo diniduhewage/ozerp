@@ -4,83 +4,81 @@ import com.onenzero.ozerp.core.dto.PermissionDTO;
 import com.onenzero.ozerp.core.dto.PermissionDeleteDTO;
 import com.onenzero.ozerp.core.dto.response.ResponseDTO;
 import com.onenzero.ozerp.core.dto.response.ResponseListDTO;
-import com.onenzero.ozerp.core.enums.ResultStatus;
-import com.onenzero.ozerp.core.error.exception.NotFoundException;
-import com.onenzero.ozerp.core.error.exception.TransformerException;
-import com.onenzero.ozerp.core.service.PermissionService;
+import com.onenzero.ozerp.core.service.impl.PermissionService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
+//@Tag(name = "PERMISSION", description = "PERMISSION API")
+//@SecurityRequirements({
+//        @SecurityRequirement(name = "bearer-jwt")
+//})
 @RestController
-@RequestMapping("api/v1")
+@RequiredArgsConstructor
+@RequestMapping("api/v1/permission")
 public class PermissionController {
+	private final PermissionService permissionService;
 
-	@Autowired
-	private PermissionService permissionService;
-
-	@PostMapping("/permissions")
+	@PostMapping
 	@PreAuthorize("hasAuthority('ADD_PERMISSION')")
-	public ResponseDTO<?> savePermission(@Valid @RequestBody PermissionDTO permissionDTO) throws TransformerException {
+	public ResponseDTO<?> savePermission(@Valid @RequestBody PermissionDTO permissionDTO) {
 
 		ResponseDTO<PermissionDTO> response = new ResponseDTO<>();
-		response.setPayload(permissionService.savePermission(permissionDTO));
-        return updateResponse(response);
+		response.setPayload(permissionService.save(permissionDTO));
+		return ResponseDTO.response(response, HttpStatus.CREATED);
 	}
 
-	@GetMapping("/permissions/{id}")
+	@GetMapping("/{id}")
 	@PreAuthorize("hasAuthority('VIEW_PERMISSION')")
-	public ResponseDTO<?> getPermissionById(@PathVariable Long id) throws NotFoundException, TransformerException {
+	public ResponseDTO<?> getPermissionById(@PathVariable Long id) throws EntityNotFoundException {
 
 		ResponseDTO<PermissionDTO> response = new ResponseDTO<>();
-		response.setPayload(permissionService.getPermissionById(id));
-		return updateResponse(response);
+		response.setPayload(permissionService.getById(id));
+		return ResponseDTO.response(response);
 
 	}
 
-	@GetMapping("/permissions")
+	@GetMapping
 	@PreAuthorize("hasAuthority('VIEW_LIST_PERMISSION')")
-	public ResponseListDTO<?> getAllPermissions() throws TransformerException {
-
-		List<PermissionDTO> permissionDTOList = permissionService.getAllPermissions();
-		ResponseListDTO<PermissionDTO> response = new ResponseListDTO<>();
-		response.setPayloadDto(permissionDTOList);
-		response.setCount(permissionDTOList.size());
-		return updateResponse(response);
+	public ResponseListDTO<?> getAllPermission(Pageable pageable) {
+		ResponseListDTO<PermissionDTO> response = permissionService.getAll(pageable);
+		return ResponseListDTO.generateResponse(response);
 
 	}
 
-	private ResponseDTO<?> updateResponse(ResponseDTO<?> response) {
-		response.setResultStatus(ResultStatus.SUCCESSFUL);
-        response.setHttpStatus(HttpStatus.OK);
-        response.setHttpCode(response.getHttpStatus().toString());
-		return response;
+	@PutMapping("/{id}")
+	@PreAuthorize("hasAuthority('EDIT_PERMISSION')")
+	public ResponseDTO<?> updatePermissionById(@PathVariable Long id, @RequestBody @Valid PermissionDTO permissionDTO) {
+		ResponseDTO<PermissionDTO> response = new ResponseDTO<>();
+		response.setPayload(permissionService.update(id, permissionDTO));
+		return ResponseDTO.response(response);
 	}
 
-	private ResponseListDTO<?> updateResponse(ResponseListDTO<?> response) {
-		response.setResultStatus(ResultStatus.SUCCESSFUL);
-        response.setHttpStatus(HttpStatus.OK);
-        response.setHttpCode(response.getHttpStatus().toString());
-		return response;
+	@DeleteMapping("/{id}")
+	@PreAuthorize("hasAuthority('DELETE_PERMISSION')")
+	public ResponseDTO<?> deletePermissionById(@PathVariable Long id) {
+		ResponseDTO<Boolean> response = new ResponseDTO<>();
+		response.setPayload(permissionService.delete(id));
+		return ResponseDTO.response(response);
 	}
 
 	@DeleteMapping("/permission")
 	@PreAuthorize("hasAuthority('DELETE_ROLE')")
-	public ResponseDTO<?> saveMerchant(@RequestBody PermissionDeleteDTO permissionDeleteDTO) throws TransformerException {
-
+	public ResponseDTO<?> deleteByRole(@RequestBody PermissionDeleteDTO permissionDeleteDTO) {
 		ResponseDTO<PermissionDeleteDTO> response = new ResponseDTO<>();
-		response.setPayload(permissionService.deletePermissionByRoleAndPermission(permissionDeleteDTO));
-		return updateResponse(response);
+		response.setPayload(permissionService.deleteByRoleAndPermission(permissionDeleteDTO));
+		return ResponseDTO.response(response);
 	}
-
 }
+
