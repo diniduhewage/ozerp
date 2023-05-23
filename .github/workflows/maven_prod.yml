@@ -1,0 +1,75 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: sg project prod workflow
+
+on: [workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    - name: Build with Maven
+      run: mvn clean install
+    - name: Build & push Docker image
+      uses: mr-smithers-excellent/docker-build-push@v5
+      with:
+        image: vijithakn/school-farming
+        tags: ${GITHUB_RUN_ID}, latest
+        registry: docker.io
+        dockerfile: Dockerfile
+        buildArgs: |
+          env_name=prod
+        username: vijithakn
+        password: 0nly4@vijitha
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@v0.1.6
+      with:
+        host: 3.6.216.178
+        username: ec2-user
+        key: |
+          -----BEGIN RSA PRIVATE KEY-----
+          MIIEogIBAAKCAQEAhTZ+apO4yyq6HX2IOc+0oewO9UJ/Ol+jZLpz7GGc7hZhWHu+
+          fMAJ+PrFPphO0bkwn+u9QfNRiA50Y+YBZqvGJ3pPKDEXJL5S1ZDkV1ohKe1lMktC
+          XfZpiM9G0qB0Re2qQ1ofxY9eIps0GQXI4vaBH6OVugATqu+6wA5nPbAIAwQD3ACy
+          IHDTeCv4ozxjXnkmtytRJOJzH4UxcfI9TYzOJoGBRoWr3VQvGcFe4zM7Dg1nABRD
+          tExkOn2jqiDWVW6w31xJ7t6JS/V3pShyXRqvuLj9Ewp2I8h/BFN2lNaz3MkeoXxi
+          jUgvaox8f/1DyrXsn+dXqu0lWa0hsGa4QcA4/wIDAQABAoIBAGcJ05aUVKexkOwm
+          oSw2YL2uXZOPr+FzAGt1XR1GE6CFZx6N+LV9xTj0n4TfQnguClJogad1kWbv508u
+          JX9I9qiqjnfEIOam4GOZA0YdzPElUtUoKVmMs+zCh0F8IvPD9aLLHzAsyN9ztUR1
+          mQEVMqNKYRHR5WSesZDEk06/zjKl1idO15GI+HBr/ltc3BeIlCx/TkWgETZiH8Ir
+          TlX3XxkfBvRjdKcMLc0o46vOB99Ufh+zl3u5qsD3azed3hD8MUiWl3/m9KK1/eWb
+          LFgSEz7Sk6z/AH3N1+5hG+ZW5hGtEe6VrBPv9e9TPXmMhnku8Ctz0Ah950PvcrZz
+          Dk2bFoECgYEAxKY7z3EtdPtoXHNnUE3ZYiy01iwM2unSWY0SiiXhNFpbm1f0GULZ
+          L2W5LPelIzXVyVzUsHReY3zAiIcG7OVCQoXa8rSam6ji74aoHxjANyD0xhIoj1Ax
+          NGWghRWt86p1GYz8gszeGLyUhiPhB7/sCRdOSDcVQAmn6rAH8ZFkIbECgYEArWrz
+          p7e5c2hwtraX49/wC7OX8EBAUb0BIR59e5js7G9WKBdcgDqGNK6lJermaTmpifD4
+          jfsZ3Z6ZT1cCxh0JkuiQtnrvSSgejEMjsksrPvTcbCxR7PvMWWfPJt54ilbgB+4Z
+          uiuy3HxZtUpNubh2+rtXaVzyTIcIWk1dhRhDga8CgYADJo6qwityRlzjrk2ncbfb
+          5M945vfFwh1GpgX4BKdZCWGSWZRlmzaTldOjrswMhl5IfZ5CvXqNqYAEL/WicgHf
+          wvlBDjez6r7IC6ZB6UmbGIITclMICMbhCgfKWhCRaNe7cxDQn6unRc4zX/vI/gAw
+          HRl5+rfycLUqA2v9KNEr4QKBgBMH4aVOLDPWCkiC0ThYoucl1k6vPl+59h3EUtD1
+          f0qTDUlpBuWrhn7Ri54VoSN7CHfy0dQC8lu3w+tJCSzkkuBkVT0xUIEevft2grxW
+          M3C9PlNAqdzv5QUKt1j0oRXNYth78KbVlNNNcirK9Kyk6amqVXVildSAHRKL2u94
+          MjBRAoGAHbmNXw1scy7fE23h3U+M+tL5Dst9Q3SD8YvNj+Sr2EJtDH4rUJkON7o9
+          kUuBBtxxaXVAiboQFEqYeKvA7JnNuKmb2nHIbBs5HVjSwMfltm6tVC52rboZ1J9r
+          iwyXzKvjUBi1eBuSlFWZqq7A0YpNJRLGKkxuRVQxfFdml47Q1C0=
+          -----END RSA PRIVATE KEY-----
+        script: |
+          docker login
+          docker pull vijithakn/school-farming:latest
+          docker stop sg
+          docker rm sg
+          docker run -d --name sg -p 8080:8080 vijithakn/school-farming:latest

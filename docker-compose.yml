@@ -1,0 +1,22 @@
+version: "3"
+services:
+  mysql-oz:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=eagriservice
+      - MYSQL_USER=oz
+      - MYSQL_PASSWORD=oz
+    ports:
+      - 3307:3306
+
+  service-oz:
+    image: service-oz:latest
+    ports:
+      - 8086:8080
+    restart: unless-stopped
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql-oz

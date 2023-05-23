@@ -1,0 +1,23 @@
+[
+  {
+    "filename": "helloDocx.docx",
+    "description": "test desc",
+    "size": 123456,
+    "created": "1661793440861",
+    "contentType": "application/docx"
+  },
+  {
+    "filename": "helloImage.png",
+    "description": "test desc",
+    "size": 123456,
+    "created": "1661793440861",
+    "contentType": "application/png"
+  },
+  {
+    "filename": "helloPdf.pdf",
+    "description": "test desc",
+    "size": 123456,
+    "created": "1661793440861",
+    "contentType": "application/pdf"
+  }
+]
