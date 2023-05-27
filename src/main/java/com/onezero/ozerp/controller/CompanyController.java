@@ -26,7 +26,7 @@ import javax.validation.Valid;
 
 
 @RestController
-@RequestMapping("api/v1")
+@RequestMapping("api/v1/company")
 @Tag(name = "company", description = "Company API")
 @SecurityRequirements({
         @SecurityRequirement(name = "bearer-jwt")
