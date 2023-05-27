@@ -7,7 +7,7 @@ import com.onezero.ozerp.dto.response.ResponseListDTO;
 import com.onezero.ozerp.error.exception.NotFoundException;
 import com.onezero.ozerp.error.exception.TransformerException;
 import com.onezero.ozerp.service.PermissionService;
-import com.onezero.ozerp.util.SaasUtil;
+import com.onezero.ozerp.util.CommonUtils;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
@@ -48,7 +48,7 @@ public class PermissionController {
 
         ResponseDTO<PermissionDTO> response = new ResponseDTO<>();
         response.setPayload(permissionService.getPermissionById(id));
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
 
     }
 
@@ -59,7 +59,7 @@ public class PermissionController {
                                                 @RequestParam(required = false) String sort) throws TransformerException {
 
         ResponseListDTO<PermissionDTO> response = permissionService.getAllPermissions(page, size, sort);
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
 
     }
 
@@ -69,7 +69,7 @@ public class PermissionController {
 
         ResponseDTO<PermissionDeleteDTO> response = new ResponseDTO<>();
         response.setPayload(permissionService.deletePermissionByRoleAndPermission(permissionDeleteDTO));
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
     }
 
 }

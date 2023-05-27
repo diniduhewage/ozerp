@@ -25,9 +25,9 @@ import java.util.Calendar;
 import java.util.UUID;
 
 @Component
-public class SaasUtil {
+public class CommonUtils {
 
-    private static Logger log = LoggerFactory.getLogger(SaasUtil.class);
+    private static Logger log = LoggerFactory.getLogger(CommonUtils.class);
 
     public static boolean isFileExist(String fileNameAndLocation) {
         boolean isFileExist = false;

@@ -3,7 +3,7 @@ package com.onezero.ozerp.transformer;
 import com.onezero.ozerp.dto.ActionDTO;
 import com.onezero.ozerp.entity.Action;
 import com.onezero.ozerp.error.exception.TransformerException;
-import com.onezero.ozerp.util.SaasUtil;
+import com.onezero.ozerp.util.CommonUtils;
 import org.springframework.stereotype.Component;
 
 
@@ -29,8 +29,8 @@ public class ActionTransformer extends AbstractTransformer<Action, ActionDTO> {
         }
         domain.setName(dto.getName());
         domain.setCode(dto.getCode());
-        domain.setCreatedDate(null != dto.getCreatedDate() ? dto.getCreatedDate() : SaasUtil.timeStampGenerator());
-        domain.setModifiedDate(SaasUtil.timeStampGenerator());
+        domain.setCreatedDate(null != dto.getCreatedDate() ? dto.getCreatedDate() : CommonUtils.timeStampGenerator());
+        domain.setModifiedDate(CommonUtils.timeStampGenerator());
         return domain;
     }
 

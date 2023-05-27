@@ -6,7 +6,7 @@ import com.onezero.ozerp.error.exception.BadRequestException;
 import com.onezero.ozerp.repository.UserRepository;
 import com.onezero.ozerp.repository.VerificationTokenRepository;
 import com.onezero.ozerp.service.VerificationTokenService;
-import com.onezero.ozerp.util.SaasUtil;
+import com.onezero.ozerp.util.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +36,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
         if (null == verificationToken) {
             throw new BadRequestException("Invalid Token!");
         }
-        if (verificationToken.getExpirationTime() > SaasUtil.timeStampGenerator()) {
+        if (verificationToken.getExpirationTime() > CommonUtils.timeStampGenerator()) {
             User user = verificationToken.getUser();
             user.setEnabled(true);
             userRepository.saveAndFlush(user);
@@ -50,7 +50,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
         VerificationToken verificationToken = verificationTokenRepository.findByToken(oldToken);
         String newToken = UUID.randomUUID().toString();
         verificationToken.setToken(newToken);
-        verificationToken.setExpirationTime(SaasUtil.timeStampGenerator() + EXPIRATION_TIME);
+        verificationToken.setExpirationTime(CommonUtils.timeStampGenerator() + EXPIRATION_TIME);
         return verificationTokenRepository.saveAndFlush(verificationToken);
     }
 

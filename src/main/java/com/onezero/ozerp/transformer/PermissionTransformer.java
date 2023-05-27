@@ -4,7 +4,7 @@ import com.onezero.ozerp.dto.PermissionDTO;
 import com.onezero.ozerp.entity.Action;
 import com.onezero.ozerp.entity.Permission;
 import com.onezero.ozerp.error.exception.TransformerException;
-import com.onezero.ozerp.util.SaasUtil;
+import com.onezero.ozerp.util.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -42,8 +42,8 @@ public class PermissionTransformer extends AbstractTransformer<Permission, Permi
         domain.setCode(action.getCode() + "_" + component.getCode());
         domain.setAction(action);
         domain.setComponent(component);
-        domain.setCreatedDate(null != dto.getCreatedDate() ? dto.getCreatedDate() : SaasUtil.timeStampGenerator());
-        domain.setModifiedDate(SaasUtil.timeStampGenerator());
+        domain.setCreatedDate(null != dto.getCreatedDate() ? dto.getCreatedDate() : CommonUtils.timeStampGenerator());
+        domain.setModifiedDate(CommonUtils.timeStampGenerator());
         return domain;
     }
 

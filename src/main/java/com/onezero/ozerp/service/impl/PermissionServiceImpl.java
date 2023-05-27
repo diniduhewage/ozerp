@@ -1,6 +1,6 @@
 package com.onezero.ozerp.service.impl;
 
-import com.onezero.ozerp.constant.EntityNotFoundConstatnt;
+import com.onezero.ozerp.constant.EntityNotFoundConstant;
 import com.onezero.ozerp.dto.ActionDTO;
 import com.onezero.ozerp.dto.ComponentDTO;
 import com.onezero.ozerp.dto.PermissionDTO;
@@ -24,7 +24,7 @@ import com.onezero.ozerp.repository.RoleRepository;
 import com.onezero.ozerp.service.PermissionService;
 import com.onezero.ozerp.transformer.ComponentTransformer;
 import com.onezero.ozerp.transformer.PermissionTransformer;
-import com.onezero.ozerp.util.SaasUtil;
+import com.onezero.ozerp.util.CommonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,15 +95,15 @@ public class PermissionServiceImpl implements PermissionService {
                 if (permissionRepository.findByCode(permission.getCode()) != null) {
                     throw new BadRequestException("Permission already registered!");
                 }
-                permission.setCreatedDate(SaasUtil.timeStampGenerator());
-                permission.setModifiedDate(SaasUtil.timeStampGenerator());
+                permission.setCreatedDate(CommonUtils.timeStampGenerator());
+                permission.setModifiedDate(CommonUtils.timeStampGenerator());
 
                 RoleDTO roleDTO = permissionManageDTO.getRoleDTO();
                 Role role = roleRepository.findById(roleDTO.getId()).orElse(null);
 
                 RolePermission rolePermission = new RolePermission();
-                rolePermission.setCreatedDate(SaasUtil.timeStampGenerator());
-                rolePermission.setModifiedDate(SaasUtil.timeStampGenerator());
+                rolePermission.setCreatedDate(CommonUtils.timeStampGenerator());
+                rolePermission.setModifiedDate(CommonUtils.timeStampGenerator());
                 rolePermission.setPermission(permission);
                 rolePermission.setRole(role);
 
@@ -118,7 +118,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Transactional(readOnly = true)
     public PermissionDTO getPermissionById(Long id) throws NotFoundException, TransformerException {
         if (!permissionRepository.existsById(id)) {
-            throw new NotFoundException(EntityNotFoundConstatnt.PERMISSION_NOT_FOUND + id);
+            throw new NotFoundException(EntityNotFoundConstant.PERMISSION_NOT_FOUND + id);
         }
         return permissionTransformer.transformDomainToDTO(permissionRepository.findById(id).get());
     }
@@ -126,7 +126,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     @Transactional(readOnly = true)
     public ResponseListDTO<PermissionDTO> getAllPermissions(Integer page, Integer size, String sort) throws TransformerException {
-        Page<Permission> pageResponse = permissionRepository.findAll(SaasUtil.createPageRequest(page, size, sort));
+        Page<Permission> pageResponse = permissionRepository.findAll(CommonUtils.createPageRequest(page, size, sort));
         List<PermissionDTO> permissionDTOList = permissionTransformer.transformDomainToDTO(pageResponse.getContent());
 
         return new ResponseListDTO<>(permissionDTOList, pageResponse.getTotalPages(), pageResponse.getTotalElements(),

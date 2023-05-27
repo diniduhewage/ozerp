@@ -3,7 +3,7 @@ package com.onezero.ozerp.transformer;
 import com.onezero.ozerp.dto.MerchantDTO;
 import com.onezero.ozerp.entity.Merchant;
 import com.onezero.ozerp.error.exception.TransformerException;
-import com.onezero.ozerp.util.SaasUtil;
+import com.onezero.ozerp.util.CommonUtils;
 import org.springframework.stereotype.Component;
 
 
@@ -30,8 +30,8 @@ public class MerchantTransformer extends AbstractTransformer<Merchant, MerchantD
         }
         domain.setName(dto.getName());
         domain.setCode(dto.getCode());
-        domain.setCreatedDate(null != dto.getCreatedDate() ? dto.getCreatedDate() : SaasUtil.timeStampGenerator());
-        domain.setModifiedDate(SaasUtil.timeStampGenerator());
+        domain.setCreatedDate(null != dto.getCreatedDate() ? dto.getCreatedDate() : CommonUtils.timeStampGenerator());
+        domain.setModifiedDate(CommonUtils.timeStampGenerator());
         return domain;
     }
 

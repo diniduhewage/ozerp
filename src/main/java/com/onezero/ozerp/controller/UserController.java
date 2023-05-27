@@ -18,7 +18,7 @@ import com.onezero.ozerp.service.EmailService;
 import com.onezero.ozerp.service.PasswordResetService;
 import com.onezero.ozerp.service.UserService;
 import com.onezero.ozerp.service.VerificationTokenService;
-import com.onezero.ozerp.util.SaasUtil;
+import com.onezero.ozerp.util.CommonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -58,21 +58,21 @@ public class UserController {
         userDTO = userService.registerUser(userDTO);
         response.setPayload(userDTO);
         publisher.publishEvent(new RegistrationCompleteEvent(userDTO, getApplicationUrl(request)));
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
     }
 
     @PostMapping("/changePassword")
     public ResponseDTO<?> changePassword(@RequestBody @Valid PasswordDTO passwordDTO) throws TransformerException {
         ResponseDTO<String> response = new ResponseDTO<>();
         response.setPayload(userService.changePassword(passwordDTO));
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
     }
 
     @PostMapping("/login")
     public ResponseDTO<?> login(@RequestBody @Valid LoginRequestDTO loginRequestDTO) throws Exception {
         ResponseDTO<JWTResponseDTO> response = new ResponseDTO<>();
         response.setPayload(userService.getToken(loginRequestDTO));
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
     }
 
     @GetMapping("/users")
@@ -81,7 +81,7 @@ public class UserController {
                                           @RequestParam(required = false) String sort) throws TransformerException {
 
         ResponseListDTO<UserDTO> response = userService.getAllUsers(page, size, sort);
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
 
     }
 
@@ -93,7 +93,7 @@ public class UserController {
             PasswordResetToken passwordResetToken = passwordResetService.createToken(userDTO);
             sendPasswordResetTokenMail(passwordResetToken, request);
             response.setPayload("Password resend link send to your mail!");
-            return SaasUtil.updateResponse(response);
+            return CommonUtils.updateResponse(response);
         }
         throw new NotFoundException("User not found");
     }
@@ -103,7 +103,7 @@ public class UserController {
         ResponseDTO<String> response = new ResponseDTO<>();
         String result = passwordResetService.validatePasswordResetTokenAndSavePassword(token, loginRequestDTO);
         response.setPayload(result);
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
     }
 
     @GetMapping("/verifyRegistration")
@@ -112,7 +112,7 @@ public class UserController {
         String result = verificationTokenService.validateVerificationToken(token);
         if (result.equalsIgnoreCase("valid")) {
             response.setPayload("User Verified Successfully!");
-            return SaasUtil.updateResponse(response);
+            return CommonUtils.updateResponse(response);
         }
         throw new BadRequestException("Bad User!");
     }
@@ -123,7 +123,7 @@ public class UserController {
         VerificationToken verificationToken = verificationTokenService.generateNewVerificationToken(oldToken);
         resendVerificationTokenMail(verificationToken, request);
         response.setPayload("Verification mail sent");
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
     }
 
     private String getApplicationUrl(HttpServletRequest request) {

@@ -1,6 +1,6 @@
 package com.onezero.ozerp.entity;
 
-import com.onezero.ozerp.util.SaasUtil;
+import com.onezero.ozerp.util.CommonUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,12 +34,12 @@ public class VerificationToken implements Serializable {
     public VerificationToken(User user, String token) {
         this.user = user;
         this.token = token;
-        this.expirationTime = SaasUtil.timeStampGenerator() + EXPIRATION_TIME;
+        this.expirationTime = CommonUtils.timeStampGenerator() + EXPIRATION_TIME;
     }
 
     public VerificationToken(String token) {
         this.token = token;
-        this.expirationTime = SaasUtil.timeStampGenerator() + EXPIRATION_TIME;
+        this.expirationTime = CommonUtils.timeStampGenerator() + EXPIRATION_TIME;
     }
 
 }

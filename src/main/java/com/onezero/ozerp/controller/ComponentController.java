@@ -6,7 +6,7 @@ import com.onezero.ozerp.dto.response.ResponseListDTO;
 import com.onezero.ozerp.error.exception.NotFoundException;
 import com.onezero.ozerp.error.exception.TransformerException;
 import com.onezero.ozerp.service.ComponentService;
-import com.onezero.ozerp.util.SaasUtil;
+import com.onezero.ozerp.util.CommonUtils;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,7 +40,7 @@ public class ComponentController {
 
         ResponseDTO<ComponentDTO> response = new ResponseDTO<>();
         response.setPayload(componentService.saveComponent(componentDTO));
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
     }
 
     @GetMapping("/components/{id}")
@@ -49,7 +49,7 @@ public class ComponentController {
 
         ResponseDTO<ComponentDTO> response = new ResponseDTO<>();
         response.setPayload(componentService.getComponentById(id));
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
 
     }
 
@@ -60,7 +60,7 @@ public class ComponentController {
                                                @RequestParam(required = false) String sort) throws TransformerException {
 
         ResponseListDTO<ComponentDTO> response = componentService.getAllComponents(page, size, sort);
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
 
     }
 

@@ -5,7 +5,7 @@ import com.onezero.ozerp.dto.response.ResponseDTO;
 import com.onezero.ozerp.dto.response.ResponseListDTO;
 import com.onezero.ozerp.error.exception.TransformerException;
 import com.onezero.ozerp.service.MerchantService;
-import com.onezero.ozerp.util.SaasUtil;
+import com.onezero.ozerp.util.CommonUtils;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -44,7 +44,7 @@ public class MerchantController {
 
         ResponseDTO<MerchantDTO> response = new ResponseDTO<>();
         response.setPayload(merchantService.saveMerchant(merchantDTO));
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
     }
 
     @GetMapping("/merchants/{id}")
@@ -53,7 +53,7 @@ public class MerchantController {
 
         ResponseDTO<MerchantDTO> response = new ResponseDTO<>();
         response.setPayload(merchantService.getMerchantById(id));
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
 
     }
 
@@ -64,7 +64,7 @@ public class MerchantController {
                                               @RequestParam(required = false) String sort) throws TransformerException {
 
         ResponseListDTO<MerchantDTO> response = merchantService.getAllMerchants(page, size, sort);
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
 
     }
 
@@ -73,7 +73,7 @@ public class MerchantController {
     public ResponseDTO<?> updateMerchantById(@PathVariable Long id, @RequestBody @Valid MerchantDTO merchantDTO) throws TransformerException {
         ResponseDTO<MerchantDTO> response = new ResponseDTO<>();
         response.setPayload(merchantService.updateMerchantById(id, merchantDTO));
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
     }
 
     @DeleteMapping("/merchants/{id}")
@@ -81,7 +81,7 @@ public class MerchantController {
     public ResponseDTO<?> deletedMerchant(@PathVariable Long id) throws TransformerException {
         ResponseDTO<Boolean> response = new ResponseDTO<>();
         response.setPayload(merchantService.deleteMerchantById(id));
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
     }
 
 }

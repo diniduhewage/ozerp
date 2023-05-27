@@ -6,7 +6,7 @@ import com.onezero.ozerp.dto.response.ResponseListDTO;
 import com.onezero.ozerp.error.exception.NotFoundException;
 import com.onezero.ozerp.error.exception.TransformerException;
 import com.onezero.ozerp.service.RoleService;
-import com.onezero.ozerp.util.SaasUtil;
+import com.onezero.ozerp.util.CommonUtils;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,7 +40,7 @@ public class RoleController {
 
         ResponseDTO<RoleDTO> response = new ResponseDTO<>();
         response.setPayload(roleService.saveRole(roleDTO));
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
     }
 
     @GetMapping("/roles/{id}")
@@ -49,7 +49,7 @@ public class RoleController {
 
         ResponseDTO<RoleDTO> response = new ResponseDTO<>();
         response.setPayload(roleService.getRoleById(id));
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
 
     }
 
@@ -60,7 +60,7 @@ public class RoleController {
                                           @RequestParam(required = false) String sort) throws TransformerException {
 
         ResponseListDTO<RoleDTO> response = roleService.getAllRoles(page, size, sort);
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
 
     }
 

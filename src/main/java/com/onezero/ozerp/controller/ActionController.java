@@ -9,7 +9,7 @@ import com.onezero.ozerp.error.exception.NotFoundException;
 import com.onezero.ozerp.error.exception.TransformerException;
 import com.onezero.ozerp.service.ActionService;
 import com.onezero.ozerp.service.PermissionService;
-import com.onezero.ozerp.util.SaasUtil;
+import com.onezero.ozerp.util.CommonUtils;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,7 +47,7 @@ public class ActionController {
 
         ResponseDTO<List<PermissionDTO>> response = new ResponseDTO<>();
         response.setPayload(permissionService.savePermission(permissionManageDTO));
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
     }
 
     @PostMapping("/actions")
@@ -56,7 +56,7 @@ public class ActionController {
 
         ResponseDTO<ActionDTO> response = new ResponseDTO<>();
         response.setPayload(actionService.saveAction(actionDTO));
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
     }
 
     @GetMapping("/actions/{id}")
@@ -65,7 +65,7 @@ public class ActionController {
 
         ResponseDTO<ActionDTO> response = new ResponseDTO<>();
         response.setPayload(actionService.getActionById(id));
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
 
     }
 
@@ -76,7 +76,7 @@ public class ActionController {
                                             @RequestParam(required = false) String sort) throws TransformerException {
 
         ResponseListDTO<ActionDTO> response = actionService.getAllActions(page, size, sort);
-        return SaasUtil.updateResponse(response);
+        return CommonUtils.updateResponse(response);
     }
 
 }

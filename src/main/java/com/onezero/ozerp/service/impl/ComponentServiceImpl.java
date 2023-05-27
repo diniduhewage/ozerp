@@ -1,6 +1,6 @@
 package com.onezero.ozerp.service.impl;
 
-import com.onezero.ozerp.constant.EntityNotFoundConstatnt;
+import com.onezero.ozerp.constant.EntityNotFoundConstant;
 import com.onezero.ozerp.dto.ComponentDTO;
 import com.onezero.ozerp.dto.response.ResponseListDTO;
 import com.onezero.ozerp.entity.Component;
@@ -9,7 +9,7 @@ import com.onezero.ozerp.error.exception.TransformerException;
 import com.onezero.ozerp.repository.ComponentRepository;
 import com.onezero.ozerp.service.ComponentService;
 import com.onezero.ozerp.transformer.ComponentTransformer;
-import com.onezero.ozerp.util.SaasUtil;
+import com.onezero.ozerp.util.CommonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,14 +37,14 @@ public class ComponentServiceImpl implements ComponentService {
     @Override
     public ComponentDTO getComponentById(Long id) throws NotFoundException, TransformerException {
         if (!componentRepository.existsById(id)) {
-            throw new NotFoundException(EntityNotFoundConstatnt.COMPONENT_NOT_FOUND + id);
+            throw new NotFoundException(EntityNotFoundConstant.COMPONENT_NOT_FOUND + id);
         }
         return componentTransformer.transformDomainToDTO(componentRepository.findById(id).get());
     }
 
     @Override
     public ResponseListDTO<ComponentDTO> getAllComponents(Integer page, Integer size, String sort) throws TransformerException {
-        Page<Component> pageResponse = componentRepository.findAll(SaasUtil.createPageRequest(page, size, sort));
+        Page<Component> pageResponse = componentRepository.findAll(CommonUtils.createPageRequest(page, size, sort));
         List<ComponentDTO> componentDTOList = componentTransformer.transformDomainToDTO(pageResponse.getContent());
         return new ResponseListDTO<>(componentDTOList, pageResponse.getTotalPages(), pageResponse.getTotalElements(),
                 pageResponse.isLast(),

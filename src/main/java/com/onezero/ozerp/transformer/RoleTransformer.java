@@ -7,7 +7,7 @@ import com.onezero.ozerp.entity.Role;
 import com.onezero.ozerp.entity.RolePermission;
 import com.onezero.ozerp.error.exception.TransformerException;
 import com.onezero.ozerp.repository.PermissionRepository;
-import com.onezero.ozerp.util.SaasUtil;
+import com.onezero.ozerp.util.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -50,14 +50,14 @@ public class RoleTransformer extends AbstractTransformer<Role, RoleDTO> {
         }
         domain.setName(dto.getName());
         domain.setCode(dto.getCode());
-        domain.setCreatedDate(null != dto.getCreatedDate() ? dto.getCreatedDate() : SaasUtil.timeStampGenerator());
-        domain.setModifiedDate(SaasUtil.timeStampGenerator());
+        domain.setCreatedDate(null != dto.getCreatedDate() ? dto.getCreatedDate() : CommonUtils.timeStampGenerator());
+        domain.setModifiedDate(CommonUtils.timeStampGenerator());
         List<RolePermission> rolePermissionList = new ArrayList<>();
         for (PermissionDTO permissionDTO : dto.getPermissionDTOs()) {
             RolePermission rolePermission = new RolePermission();
             rolePermission.setPermission(permissionRepository.findById(permissionDTO.getId()).get());
-            rolePermission.setCreatedDate(null != permissionDTO.getCreatedDate() ? permissionDTO.getCreatedDate() : SaasUtil.timeStampGenerator());
-            rolePermission.setModifiedDate(SaasUtil.timeStampGenerator());
+            rolePermission.setCreatedDate(null != permissionDTO.getCreatedDate() ? permissionDTO.getCreatedDate() : CommonUtils.timeStampGenerator());
+            rolePermission.setModifiedDate(CommonUtils.timeStampGenerator());
             rolePermissionList.add(rolePermission);
         }
         domain.setRolePermissions(rolePermissionList);

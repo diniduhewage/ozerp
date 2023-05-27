@@ -16,8 +16,8 @@ import com.onezero.ozerp.repository.UserRepository;
 import com.onezero.ozerp.service.RoleService;
 import com.onezero.ozerp.service.UserService;
 import com.onezero.ozerp.transformer.UserTransformer;
+import com.onezero.ozerp.util.CommonUtils;
 import com.onezero.ozerp.util.JWTUtility;
-import com.onezero.ozerp.util.SaasUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -184,7 +184,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public ResponseListDTO<UserDTO> getAllUsers(Integer page, Integer size, String sort) throws TransformerException {
-        Page<User> pageResponse = userRepository.findAll(SaasUtil.createPageRequest(page, size, sort));
+        Page<User> pageResponse = userRepository.findAll(CommonUtils.createPageRequest(page, size, sort));
         List<UserDTO> userDTOList = userTransformer.transformDomainToDTO(pageResponse.getContent());
         return new ResponseListDTO<>(userDTOList, pageResponse.getTotalPages(), pageResponse.getTotalElements(),
                 pageResponse.isLast(),

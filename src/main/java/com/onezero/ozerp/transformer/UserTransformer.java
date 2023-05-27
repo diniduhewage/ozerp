@@ -7,7 +7,7 @@ import com.onezero.ozerp.entity.User;
 import com.onezero.ozerp.entity.UserRole;
 import com.onezero.ozerp.error.exception.TransformerException;
 import com.onezero.ozerp.repository.RoleRepository;
-import com.onezero.ozerp.util.SaasUtil;
+import com.onezero.ozerp.util.CommonUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -48,15 +48,15 @@ public class UserTransformer extends AbstractTransformer<User, UserDTO> {
         BeanUtils.copyProperties(dto, domain);
 
         domain.setPassword(passwordEncoder.encode(dto.getPassword()));
-        domain.setCreatedDate(null != dto.getCreatedDate() ? dto.getCreatedDate() : SaasUtil.timeStampGenerator());
-        domain.setAccountCreationDate(null != dto.getCreatedDate() ? dto.getCreatedDate() : SaasUtil.timeStampGenerator());
-        domain.setModifiedDate(SaasUtil.timeStampGenerator());
+        domain.setCreatedDate(null != dto.getCreatedDate() ? dto.getCreatedDate() : CommonUtils.timeStampGenerator());
+        domain.setAccountCreationDate(null != dto.getCreatedDate() ? dto.getCreatedDate() : CommonUtils.timeStampGenerator());
+        domain.setModifiedDate(CommonUtils.timeStampGenerator());
         List<UserRole> userRoleList = new ArrayList<>();
         for (RoleDTO roleDTO : dto.getRoleDTOs()) {
             UserRole userRole = new UserRole();
             userRole.setRole(roleRepository.findById(roleDTO.getId()).get());
-            userRole.setCreatedDate(null != roleDTO.getCreatedDate() ? roleDTO.getCreatedDate() : SaasUtil.timeStampGenerator());
-            userRole.setModifiedDate(SaasUtil.timeStampGenerator());
+            userRole.setCreatedDate(null != roleDTO.getCreatedDate() ? roleDTO.getCreatedDate() : CommonUtils.timeStampGenerator());
+            userRole.setModifiedDate(CommonUtils.timeStampGenerator());
             userRoleList.add(userRole);
         }
         domain.setUserRoles(userRoleList);

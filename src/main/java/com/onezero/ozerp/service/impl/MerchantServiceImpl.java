@@ -1,6 +1,6 @@
 package com.onezero.ozerp.service.impl;
 
-import com.onezero.ozerp.constant.EntityNotFoundConstatnt;
+import com.onezero.ozerp.constant.EntityNotFoundConstant;
 import com.onezero.ozerp.dto.MerchantDTO;
 import com.onezero.ozerp.dto.response.ResponseListDTO;
 import com.onezero.ozerp.entity.Merchant;
@@ -9,7 +9,7 @@ import com.onezero.ozerp.error.exception.TransformerException;
 import com.onezero.ozerp.repository.MerchantRepository;
 import com.onezero.ozerp.service.MerchantService;
 import com.onezero.ozerp.transformer.MerchantTransformer;
-import com.onezero.ozerp.util.SaasUtil;
+import com.onezero.ozerp.util.CommonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,14 +39,14 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     public MerchantDTO getMerchantById(Long id) throws EntityNotFoundException, TransformerException {
         if (!merchantRepository.existsById(id)) {
-            throw new NotFoundException(EntityNotFoundConstatnt.MERCHANT_NOT_FOUND + id);
+            throw new NotFoundException(EntityNotFoundConstant.MERCHANT_NOT_FOUND + id);
         }
         return merchantTransformer.transformDomainToDTO(merchantRepository.findById(id).get());
     }
 
     @Override
     public ResponseListDTO<MerchantDTO> getAllMerchants(Integer page, Integer size, String sort) throws TransformerException {
-        Page<Merchant> pageResponse = merchantRepository.findAll(SaasUtil.createPageRequest(page, size, sort));
+        Page<Merchant> pageResponse = merchantRepository.findAll(CommonUtils.createPageRequest(page, size, sort));
         List<MerchantDTO> merchantDTOList = merchantTransformer.transformDomainToDTO(pageResponse.getContent());
 
         return new ResponseListDTO<>(merchantDTOList, pageResponse.getTotalPages(), pageResponse.getTotalElements(),
@@ -58,7 +58,7 @@ public class MerchantServiceImpl implements MerchantService {
     public MerchantDTO updateMerchantById(Long id, MerchantDTO merchantDTO) throws TransformerException {
 
         if (!merchantRepository.existsById(id)) {
-            throw new NotFoundException(EntityNotFoundConstatnt.MERCHANT_NOT_FOUND + id);
+            throw new NotFoundException(EntityNotFoundConstant.MERCHANT_NOT_FOUND + id);
         } else {
             Merchant savedMerchant = merchantRepository.findById(id).get();
             if (Objects.nonNull(merchantDTO.getName()) && !"".equalsIgnoreCase(merchantDTO.getName())) {
@@ -67,7 +67,7 @@ public class MerchantServiceImpl implements MerchantService {
             if (Objects.nonNull(merchantDTO.getCode()) && !"".equalsIgnoreCase(merchantDTO.getCode())) {
                 savedMerchant.setCode(merchantDTO.getCode());
             }
-            savedMerchant.setModifiedDate(SaasUtil.timeStampGenerator());
+            savedMerchant.setModifiedDate(CommonUtils.timeStampGenerator());
             return merchantTransformer.transformDomainToDTO(merchantRepository.saveAndFlush(savedMerchant));
 
         }

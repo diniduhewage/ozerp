@@ -8,7 +8,7 @@ import com.onezero.ozerp.error.exception.BadRequestException;
 import com.onezero.ozerp.repository.PasswordResetRepository;
 import com.onezero.ozerp.repository.UserRepository;
 import com.onezero.ozerp.service.PasswordResetService;
-import com.onezero.ozerp.util.SaasUtil;
+import com.onezero.ozerp.util.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,7 +38,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
 
         if (null != passwordResetToken) {
             passwordResetToken.setToken(token);
-            passwordResetToken.setExpirationTime(SaasUtil.timeStampGenerator() + EXPIRATION_TIME);
+            passwordResetToken.setExpirationTime(CommonUtils.timeStampGenerator() + EXPIRATION_TIME);
             return passwordResetRepository.saveAndFlush(passwordResetToken);
         }
         return passwordResetRepository.saveAndFlush(new PasswordResetToken(new User(userDTO.getId()), token));
@@ -51,11 +51,11 @@ public class PasswordResetServiceImpl implements PasswordResetService {
         if (null == passwordResetToken) {
             return "Invalid Token";
         }
-        if (passwordResetToken.getExpirationTime() > SaasUtil.timeStampGenerator()) {
+        if (passwordResetToken.getExpirationTime() > CommonUtils.timeStampGenerator()) {
             User user = passwordResetToken.getUser();
             user.setPassword(passwordEncoder.encode(loginRequestDTO.getPassword()));
             userRepository.saveAndFlush(user);
-            passwordResetToken.setExpirationTime(SaasUtil.timeStampGenerator());
+            passwordResetToken.setExpirationTime(CommonUtils.timeStampGenerator());
             passwordResetRepository.saveAndFlush(passwordResetToken);
             return "Password reset successfully...";
         }
