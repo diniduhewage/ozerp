@@ -14,11 +14,13 @@ import com.onezero.ozerp.repository.UserRoleRepository;
 import lombok.AllArgsConstructor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.persistence.Entity;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -30,29 +32,35 @@ import java.util.List;
 @AllArgsConstructor
 public class InitialDataDeployer {
 
-    private final static String ADD = "ADD";
-    private final static String VIEW = "VIEW";
-    private final static String VIEW_LIST = "VIEW_LIST";
-    private final static String EDIT = "EDIT";
-    private final static String DELETE = "DELETE";
     private final Long timestamp = DateTime.now(DateTimeZone.UTC).getMillis();
+    private final PasswordEncoder passwordEncoder;
     private final ActionRepository actionRepository;
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final ComponentRepository componentRepository;
 
-    @PostConstruct
-    public void appReady() throws ParseException {
+    @EventListener
+    public void appReady(ApplicationEvent event) throws ParseException {
+        List<Role> roles = Arrays.asList(
+                new Role(null, "Admin", "ADMIN", timestamp, null, null, null)
+                , new Role(null, "System User", "SYSTEM_USER", timestamp, null, null, null)
+        );
 
-        Role adminRole = roleRepository.findByCode("SUPER_ADMIN");
+        roles.forEach(role -> {
+            if (!roleRepository.existsByCode(role.getCode())) {
+                roleRepository.saveAndFlush(role);
+            }
+        });
+
+        Role adminRole = roleRepository.findByCode("ADMIN");
 
         User adminUser = new User();
         adminUser.setEmail("admin@admin.com");
         adminUser.setFirstName("super");
         adminUser.setLastName("admin");
         adminUser.setEnabled(true);
-        adminUser.setPassword("$2a$11$0ucwxHF.3670kBEoSqgd1e8Zqez44eS2fsc2tmNrGV6UUdUxhN2K.");
+        adminUser.setPassword(passwordEncoder.encode("1234"));
         adminUser.setCreatedDate(timestamp);
 
         User savedAdminUser;
@@ -67,15 +75,36 @@ public class InitialDataDeployer {
             userRoleRepository.saveAndFlush(userRole);
         }
 
-        Action finalAddAction = actionRepository.findByCode(ADD);
-        Action finalViewAction = actionRepository.findByCode(VIEW);
-        Action finalViewListAction = actionRepository.findByCode(VIEW_LIST);
-        Action finalEditAction = actionRepository.findByCode(EDIT);
-        Action finalDeleteAction = actionRepository.findByCode(DELETE);
+
+        Action addAction = new Action(null, "Add", "ADD", timestamp, timestamp, null);
+        if (!actionRepository.existsByCode(addAction.getCode())) {
+            addAction = actionRepository.saveAndFlush(addAction);
+        }
+        Action viewAction = new Action(null, "View", "VIEW", timestamp, timestamp, null);
+        if (!actionRepository.existsByCode(viewAction.getCode())) {
+            viewAction = actionRepository.saveAndFlush(viewAction);
+        }
+        Action viewListAction = new Action(null, "View List", "VIEW_LIST", timestamp, timestamp, null);
+        if (!actionRepository.existsByCode(viewListAction.getCode())) {
+            viewListAction = actionRepository.saveAndFlush(viewListAction);
+        }
+        Action editAction = new Action(null, "Edit", "EDIT", timestamp, timestamp, null);
+        if (!actionRepository.existsByCode(editAction.getCode())) {
+            editAction = actionRepository.saveAndFlush(editAction);
+        }
+        Action deleteAction = new Action(null, "Delete", "DELETE", timestamp, timestamp, null);
+        if (!actionRepository.existsByCode(deleteAction.getCode())) {
+            deleteAction = actionRepository.saveAndFlush(deleteAction);
+        }
+
+        Action finalAddAction = actionRepository.findByCode(addAction.getCode());
+        Action finalViewAction = actionRepository.findByCode(viewAction.getCode());
+        Action finalViewListAction = actionRepository.findByCode(viewListAction.getCode());
+        Action finalEditAction = actionRepository.findByCode(editAction.getCode());
+        Action finalDeleteAction = actionRepository.findByCode(deleteAction.getCode());
 
         List<String> entityNames = scanEntityNames();
         Collections.sort(entityNames);
-        List<com.onezero.ozerp.entity.Component> componentList = new ArrayList<>();
         entityNames.forEach(entity -> {
             if (!entity.equalsIgnoreCase("PasswordResetToken") && !entity.equalsIgnoreCase("VerificationToken")) {
                 com.onezero.ozerp.entity.Component component =
@@ -83,12 +112,11 @@ public class InitialDataDeployer {
                 if (!componentRepository.existsByCode(component.getCode())) {
                     assert savedAdminUser != null;
                     List<Permission> permissions = Arrays.asList(
-                            new Permission(null, ADD + "_" + component.getCode(), timestamp, timestamp, component, finalAddAction, new ArrayList<>()),
-                            new Permission(null, VIEW + "_" + component.getCode(), timestamp, timestamp, component, finalViewAction, new ArrayList<>()),
-                            new Permission(null, VIEW_LIST + "_" + component.getCode(), timestamp, timestamp, component,
-                                    finalViewListAction, new ArrayList<>()),
-                            new Permission(null, EDIT + "_" + component.getCode(), timestamp, timestamp, component, finalEditAction, new ArrayList<>()),
-                            new Permission(null, DELETE + "_" + component.getCode(), timestamp, timestamp, component, finalDeleteAction, new ArrayList<>())
+                            new Permission(null, "ADD_" + component.getCode(), timestamp, timestamp, component, finalAddAction, new ArrayList<>()),
+                            new Permission(null, "VIEW_" + component.getCode(), timestamp, timestamp, component, finalViewAction, new ArrayList<>()),
+                            new Permission(null, "VIEW_LIST_" + component.getCode(), timestamp, timestamp, component, finalViewListAction, new ArrayList<>()),
+                            new Permission(null, "EDIT_" + component.getCode(), timestamp, timestamp, component, finalEditAction, new ArrayList<>()),
+                            new Permission(null, "DELETE_" + component.getCode(), timestamp, timestamp, component, finalDeleteAction, new ArrayList<>())
                     );
 
                     permissions.forEach(permission -> {
@@ -96,13 +124,14 @@ public class InitialDataDeployer {
                         permission.getRolePermissions().add(rolePermission);
                     });
 
+
                     component.setPermissions(permissions);
-                    componentList.add(component);
+                    System.out.println("Saving component: " + component.getPermissions().toString());
+                    componentRepository.saveAndFlush(component);
                 }
 
             }
         });
-        componentRepository.saveAll(componentList);
     }
 
     private List<String> scanEntityNames() {
@@ -110,7 +139,7 @@ public class InitialDataDeployer {
                 new ClassPathScanningCandidateComponentProvider(false);
         provider.addIncludeFilter(new AnnotationTypeFilter(Entity.class));
         List<String> entityNames = new ArrayList<>();
-        for (Class<?> clazz : provider.findCandidateComponents("com.onenzero.ozerp.entity")
+        for (Class<?> clazz : provider.findCandidateComponents("com.onezero.ozerp.entity")
                 .stream()
                 .map(beanDef -> {
                     try {

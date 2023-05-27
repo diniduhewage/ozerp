@@ -13,7 +13,7 @@
     <artifactId>ozerp</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>eagriservice</name>
+    <name>rentalservice</name>
     <description>access management system</description>
     <properties>
         <java.version>1.8</java.version>
@@ -172,7 +172,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.onezero.ozerp.EAgriServiceApplication</mainClass>
+                    <mainClass>com.onezero.ozerp.Application</mainClass>
                     <layout>JAR</layout>
                 </configuration>
                 <executions>

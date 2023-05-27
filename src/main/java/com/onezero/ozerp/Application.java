@@ -16,10 +16,10 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
-public class EAgriServiceApplication extends SpringBootServletInitializer {
+public class Application extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
-        SpringApplication.run(EAgriServiceApplication.class, args);
+        SpringApplication.run(Application.class, args);
     }
 
 
