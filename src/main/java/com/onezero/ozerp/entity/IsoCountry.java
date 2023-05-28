@@ -1,5 +1,6 @@
 package com.onezero.ozerp.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,10 +20,12 @@ import java.io.Serializable;
 public class IsoCountry implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String countryCode;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String description;
 
 }

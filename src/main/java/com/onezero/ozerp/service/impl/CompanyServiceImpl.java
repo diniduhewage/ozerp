@@ -5,17 +5,24 @@ import com.onezero.ozerp.dto.CompanyAddressDTO;
 import com.onezero.ozerp.dto.CompanyDTO;
 import com.onezero.ozerp.dto.response.ResponseListDTO;
 import com.onezero.ozerp.entity.Company;
+import com.onezero.ozerp.entity.CompanyAddress;
+import com.onezero.ozerp.entity.IsoCountry;
+import com.onezero.ozerp.entity.IsoCurrency;
+import com.onezero.ozerp.error.exception.BadRequestException;
+import com.onezero.ozerp.error.exception.NotFoundException;
 import com.onezero.ozerp.repository.CompanyAddressRepository;
 import com.onezero.ozerp.repository.CompanyRepository;
+import com.onezero.ozerp.repository.IsoCountryRepository;
+import com.onezero.ozerp.repository.IsoCurrencyRepository;
 import com.onezero.ozerp.service.CompanyService;
-import com.onezero.ozerp.util.CommonUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import javax.persistence.EntityNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,12 +31,21 @@ import java.util.stream.Collectors;
 public class CompanyServiceImpl implements CompanyService {
     private final CompanyRepository companyRepository;
     private final CompanyAddressRepository companyAddressRepository;
+    private final IsoCurrencyRepository isoCurrencyRepository;
+    private final IsoCountryRepository isoCountryRepository;
 
     @Override
     public CompanyDTO getById(Long id) {
-        Company company = companyRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(EntityNotFoundConstant.RECORD_NOT_FOUND));
+        Company company = companyRepository.findById(id).orElseThrow(() -> new NotFoundException(EntityNotFoundConstant.RECORD_NOT_FOUND + id));
+        List<CompanyAddressDTO> addressDTOList = new ArrayList<>();
+        company.getAddresses().forEach(companyAddress -> {
+            CompanyAddressDTO companyAddressDTO = new CompanyAddressDTO();
+            BeanUtils.copyProperties(companyAddress, companyAddressDTO);
+            addressDTOList.add(companyAddressDTO);
+        });
         CompanyDTO companyDTO = new CompanyDTO();
         BeanUtils.copyProperties(company, companyDTO);
+        companyDTO.setAddresses(addressDTOList);
         return companyDTO;
     }
 
@@ -37,7 +53,7 @@ public class CompanyServiceImpl implements CompanyService {
     public CompanyDTO getByCompanyId(String companyId) {
         Company company = companyRepository.findByCompanyId(companyId);
         if (company == null) {
-            throw new EntityNotFoundException(EntityNotFoundConstant.RECORD_NOT_FOUND);
+            throw new NotFoundException(EntityNotFoundConstant.RECORD_NOT_FOUND);
         }
         CompanyDTO companyDTO = new CompanyDTO();
         BeanUtils.copyProperties(company, companyDTO);
@@ -64,9 +80,13 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public CompanyDTO save(CompanyDTO companyDTO) {
-        companyDTO.setCreatedDate(CommonUtils.timeStampGenerator());
+        IsoCurrency currency = isoCurrencyRepository.findByCurrencyCode(companyDTO.getAccountingCurrency().getCurrencyCode());
+        if (currency == null) {
+            throw new NotFoundException(String.format(EntityNotFoundConstant.INVALID_CURRENCY, companyDTO.getAccountingCurrency().getCurrencyCode()));
+        }
         Company company = new Company();
         BeanUtils.copyProperties(companyDTO, company);
+        company.setAccountingCurrency(currency);
         Company savedCompany = companyRepository.save(company);
         CompanyDTO returnCompanyDTO = new CompanyDTO();
         BeanUtils.copyProperties(savedCompany, returnCompanyDTO);
@@ -75,17 +95,58 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public CompanyDTO update(Long id, CompanyDTO companyDTO) {
-        return null;
+        Company company = companyRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(EntityNotFoundConstant.RECORD_NOT_FOUND + companyDTO.getId()));
+        if(StringUtils.hasText(companyDTO.getCompanyId()) && !company.getCompanyId().equals(companyDTO.getCompanyId())) {
+            company.setDescription(companyDTO.getDescription());
+        }
+        if(StringUtils.hasText(companyDTO.getDescription())) {
+            company.setDescription(companyDTO.getDescription());
+        }
+        if(companyDTO.getAccountingCurrency() != null && !company.getAccountingCurrency().equals(companyDTO.getAccountingCurrency())) {
+            IsoCurrency currency = isoCurrencyRepository.findByCurrencyCode(companyDTO.getAccountingCurrency().getCurrencyCode());
+            if (currency == null) {
+                throw new NotFoundException(String.format(EntityNotFoundConstant.INVALID_CURRENCY, companyDTO.getAccountingCurrency().getCurrencyCode()));
+            }
+            company.setAccountingCurrency(currency);
+        }
+        Company savedCompany = companyRepository.save(company);
+        CompanyDTO returnCompanyDTO = new CompanyDTO();
+        BeanUtils.copyProperties(savedCompany, returnCompanyDTO);
+        return returnCompanyDTO;
     }
 
     @Override
     public boolean delete(Long id) {
-        return false;
+        if(companyRepository.existsById(id)) {
+            companyRepository.deleteById(id);
+            return true;
+        } else {
+            throw new NotFoundException(EntityNotFoundConstant.RECORD_NOT_FOUND + id);
+        }
     }
 
     @Override
     public CompanyAddressDTO saveAddress(CompanyAddressDTO companyAddressDTO) {
-        return null;
+        IsoCountry currency = isoCountryRepository.findByCountryCode(companyAddressDTO.getCountry().getCountryCode());
+        if (currency == null) {
+            throw new NotFoundException(String.format(EntityNotFoundConstant.INVALID_COUNTRY, companyAddressDTO.getCountry().getCountryCode()));
+        }
+        if(companyAddressDTO.getCompany() == null || companyAddressDTO.getCompany().getId() == null){
+            throw new BadRequestException("Company id is required");
+        }
+        Company company = companyRepository.findById(companyAddressDTO.getCompany().getId())
+                .orElseThrow(() -> new NotFoundException(EntityNotFoundConstant.RECORD_NOT_FOUND + companyAddressDTO.getCompany().getId()));
+        CompanyAddress companyAddress = new CompanyAddress();
+        BeanUtils.copyProperties(companyAddressDTO, companyAddress);
+        companyAddress.setCompany(company);
+        CompanyAddress savedCompanyAddress = companyAddressRepository.save(companyAddress);
+        CompanyAddressDTO returnCompanyAddressDTO = new CompanyAddressDTO();
+        BeanUtils.copyProperties(savedCompanyAddress, returnCompanyAddressDTO);
+        CompanyDTO companyDTO = new CompanyDTO();
+        BeanUtils.copyProperties(savedCompanyAddress.getCompany(), companyDTO);
+        returnCompanyAddressDTO.setCompany(companyDTO);
+        return returnCompanyAddressDTO;
     }
 
     @Override
