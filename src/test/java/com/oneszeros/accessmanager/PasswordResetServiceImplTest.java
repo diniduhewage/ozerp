@@ -1,11 +1,11 @@
 package com.oneszeros.accessmanager;
 
-import com.onezero.ozerp.dto.UserDTO;
-import com.onezero.ozerp.entity.PasswordResetToken;
-import com.onezero.ozerp.entity.User;
-import com.onezero.ozerp.repository.PasswordResetRepository;
-import com.onezero.ozerp.service.impl.PasswordResetServiceImpl;
-import com.onezero.ozerp.util.SaasUtil;
+import com.onezero.ozerp.appbase.dto.UserDTO;
+import com.onezero.ozerp.appbase.entity.PasswordResetToken;
+import com.onezero.ozerp.appbase.entity.User;
+import com.onezero.ozerp.appbase.repository.PasswordResetRepository;
+import com.onezero.ozerp.appbase.service.impl.PasswordResetServiceImpl;
+import com.onezero.ozerp.appbase.util.CommonUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -30,7 +30,7 @@ public class PasswordResetServiceImplTest {
         userDTO.setId(1L);
         String token = "aa2b722e-df04-41b0-b7a4-3880ddb0de96";
         PasswordResetToken existingToken = new PasswordResetToken(new User(1L), token);
-        existingToken.setExpirationTime(SaasUtil.timeStampGenerator() - 1);
+        existingToken.setExpirationTime(CommonUtils.timeStampGenerator() - 1);
 
         Mockito.when(passwordResetRepository.findByUserId(1L)).thenReturn(existingToken);
         Mockito.when(passwordResetRepository.saveAndFlush(existingToken)).thenReturn(existingToken);
@@ -38,7 +38,7 @@ public class PasswordResetServiceImplTest {
         PasswordResetToken newToken = passwordResetService.createToken(userDTO);
 
         Mockito.verify(passwordResetRepository, Mockito.times(1)).saveAndFlush(existingToken);
-        assertNotEquals(SaasUtil.timeStampGenerator() - 1, newToken.getExpirationTime());
+        assertNotEquals(CommonUtils.timeStampGenerator() - 1, newToken.getExpirationTime());
     }
 
 }
