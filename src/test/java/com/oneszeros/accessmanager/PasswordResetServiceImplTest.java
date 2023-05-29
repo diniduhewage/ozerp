@@ -1,11 +1,11 @@
 package com.oneszeros.accessmanager;
 
-import com.onezero.ozerp.dto.UserDTO;
-import com.onezero.ozerp.entity.PasswordResetToken;
-import com.onezero.ozerp.entity.User;
-import com.onezero.ozerp.repository.PasswordResetRepository;
-import com.onezero.ozerp.service.impl.PasswordResetServiceImpl;
-import com.onezero.ozerp.util.CommonUtils;
+import com.onezero.ozerp.appbase.dto.UserDTO;
+import com.onezero.ozerp.appbase.entity.PasswordResetToken;
+import com.onezero.ozerp.appbase.entity.User;
+import com.onezero.ozerp.appbase.repository.PasswordResetRepository;
+import com.onezero.ozerp.appbase.service.impl.PasswordResetServiceImpl;
+import com.onezero.ozerp.appbase.util.CommonUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
