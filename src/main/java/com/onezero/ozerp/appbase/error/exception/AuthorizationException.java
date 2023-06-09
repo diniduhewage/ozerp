@@ -1,6 +1,6 @@
 package com.onezero.ozerp.appbase.error.exception;
 
-public class AuthorizationException extends AccessManagerRuntimeException {
+public class AuthorizationException extends OzErpRuntimeException {
 
     private static final long serialVersionUID = 1L;
 

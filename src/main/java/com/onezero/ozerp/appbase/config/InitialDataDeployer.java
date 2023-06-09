@@ -139,7 +139,7 @@ public class InitialDataDeployer {
                 new ClassPathScanningCandidateComponentProvider(false);
         provider.addIncludeFilter(new AnnotationTypeFilter(Entity.class));
         List<String> entityNames = new ArrayList<>();
-        for (Class<?> clazz : provider.findCandidateComponents("com.onezero.ozerp.entity")
+        for (Class<?> clazz : provider.findCandidateComponents("com.onezero.ozerp.enterprise.entity")
                 .stream()
                 .map(beanDef -> {
                     try {

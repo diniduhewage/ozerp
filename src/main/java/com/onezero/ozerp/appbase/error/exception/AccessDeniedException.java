@@ -1,6 +1,6 @@
 package com.onezero.ozerp.appbase.error.exception;
 
-public class AccessDeniedException extends AccessManagerRuntimeException {
+public class AccessDeniedException extends OzErpRuntimeException {
 
     private static final long serialVersionUID = 1L;
 

@@ -18,6 +18,8 @@ import com.onezero.ozerp.appbase.service.UserService;
 import com.onezero.ozerp.appbase.transformer.UserTransformer;
 import com.onezero.ozerp.appbase.util.CommonUtils;
 import com.onezero.ozerp.appbase.util.JWTUtility;
+import com.onezero.ozerp.enterprise.repository.TenantRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,6 +57,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private JWTUtility jwtUtility;
     @Autowired
     private RoleService roleService;
+    
+    @Autowired
+    private TenantRepository tenantRepository;
 
     @Override
     public UserDTO registerUser(UserDTO userDTO) throws TransformerException {
@@ -163,7 +170,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     public JWTResponseDTO getToken(LoginRequestDTO loginRequestDTO) throws TransformerException {
-        UserDTO findUserByEmail = findUserByEmail(loginRequestDTO.getUserName());
+      //  UserDTO findUserByEmail = findUserByEmail(loginRequestDTO.getUserName());
+    	User findUserByEmail = userRepository.findByEmail(loginRequestDTO.getUserName());
         if (findUserByEmail == null) {
             throw new AuthorizationException("Invalid Credentials!");
         }
@@ -174,7 +182,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 //			findUserByEmail.getRoleDTOs().forEach(role -> {
 //				roleLits.add(role.getCode());
 //			});
-            final String token = jwtUtility.generateToken(userDetails, roleCodeByEmail, findUserByEmail.isEnabled());
+        	List<Long> tenantIdList = new ArrayList<>();
+        	findUserByEmail.getUserTenantList().forEach(userTenant -> {
+        		tenantIdList.add(userTenant.getTenant().getId());
+        	});
+        	List<String> findTenantApiKeysByIds = tenantRepository.findTenantApiKeysByIds(tenantIdList);
+        	
+			final String token = jwtUtility.generateToken(userDetails, roleCodeByEmail, findUserByEmail.isEnabled(),
+					findTenantApiKeysByIds.hashCode(), tenantIdList, findUserByEmail.isContextUser());
             return new JWTResponseDTO(token);
         } else {
             throw new AuthorizationException("Invalid Credentials!");

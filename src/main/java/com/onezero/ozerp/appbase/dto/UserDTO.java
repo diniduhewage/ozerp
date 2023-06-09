@@ -20,7 +20,8 @@ import java.util.List;
 @JsonInclude(Include.NON_NULL)
 public class UserDTO implements Serializable {
 
-    private Long id;
+    private static final long serialVersionUID = -8767613395385873366L;
+	private Long id;
     @NotEmpty(message = "Please provide firstName")
     private String firstName;
     @NotEmpty(message = "Please provide lastName")
@@ -59,6 +60,7 @@ public class UserDTO implements Serializable {
     private String timezone;
     private boolean notifications;
     private String notificationSettings;
+    private boolean contextUser;
 
 
 }

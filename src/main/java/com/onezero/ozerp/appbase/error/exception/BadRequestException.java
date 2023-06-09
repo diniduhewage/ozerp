@@ -1,7 +1,7 @@
 package com.onezero.ozerp.appbase.error.exception;
 
 
-public class BadRequestException extends AccessManagerRuntimeException {
+public class BadRequestException extends OzErpRuntimeException {
 
     private static final long serialVersionUID = 1L;
 

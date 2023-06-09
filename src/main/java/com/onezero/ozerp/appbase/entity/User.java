@@ -1,8 +1,7 @@
 package com.onezero.ozerp.appbase.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -13,8 +12,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.OneToMany;
-import java.io.Serializable;
-import java.util.List;
+
+import com.onezero.ozerp.enterprise.entity.UserTenant;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
@@ -22,8 +25,8 @@ import java.util.List;
 @AllArgsConstructor
 public class User implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
+    private static final long serialVersionUID = 8934263101498163138L;
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String firstName;
@@ -35,6 +38,8 @@ public class User implements Serializable {
     private Long createdDate;
     private Long modifiedDate;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private List<UserTenant> userTenantList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.EAGER)
     private List<UserRole> userRoles;
 
@@ -63,6 +68,7 @@ public class User implements Serializable {
     private String timezone;
     private boolean notifications;
     private String notificationSettings;
+    private boolean contextUser;
     // private UserAccessLog accessLogs;
 
     public User(Long id) {
